@@ -5,8 +5,8 @@ import numpy as np
 
 
 # 打开模型文件
-model_file = r'C:\Users\OUC\Desktop\模型结果\最新的浮筒+7kg+v0.2阻力0.5升力0.05.sim'
-excel_file = r'C:\Users\OUC\Desktop\模型结果\test_result.xlsx'
+model_file = r'./example.sim'
+excel_file = r'./example.xlsx'
 
 model = OrcFxAPI.Model()
 
@@ -16,11 +16,12 @@ model.LoadSimulation(model_file) # load entire simulation file
 model.RunSimulation()
 
 line = model['riser']
-period = OrcFxAPI.SpecifiedPeriod(20.0, 79.0)
-sample = 0.049998
+n, m = 20.0, 79.0 # 设置周期范围
+period = OrcFxAPI.SpecifiedPeriod(n, m)
+sample = 0.049998 # 设置采样间隔
 
-times = []
-i, n, m = 1, 20.0, 79.0
+times = [] # 保存采样序列
+i = 1
 while n < m:
     n = 20.0
     n = n+i * sample
@@ -31,12 +32,12 @@ while n < m:
 nums = 105 #点的个数设置需要生成的
 
 # 获取endA
-x = line.TimeHistory('X', period=period, objectExtra=OrcFxAPI.oeEndA)
+x = line.TimeHistory('X', period=period, objectExtra=OrcFxAPI.oeEndA) # 端点A的接口
 x_datas = [np.array(times), x]
                      
 for i in range(1,nums+1):
     times.append(20.0 + sample)
-    x = line.TimeHistory('X', period=period, objectExtra=OrcFxAPI.oeNodeNum(i))
+    x = line.TimeHistory('X', period=period, objectExtra=OrcFxAPI.oeNodeNum(i)) # 其他点的接口
     y = line.TimeHistory('Y', period=period, objectExtra=OrcFxAPI.oeNodeNum(i))
     x_datas.append(x)
     x_datas.append(y)
